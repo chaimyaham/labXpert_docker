@@ -2,6 +2,7 @@ package com.aitnacer.LabXpert.config;
 
 import com.aitnacer.LabXpert.dtos.echantillon.EchantillonDto;
 import com.aitnacer.LabXpert.entity.Echantillon;
+import com.aitnacer.LabXpert.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -15,6 +16,9 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,6 +29,8 @@ import java.time.format.DateTimeFormatter;
 @ComponentScan("com.aitnacer.LabXpert")
 @RequiredArgsConstructor
 public class AppConfig {
+
+    private final UserRepository userRepository;
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
@@ -67,5 +73,12 @@ public class AppConfig {
 
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(){
+        return username -> userRepository.findByUserName(username)
+                .orElseThrow(()-> new UsernameNotFoundException("user not found"));
+
     }
 }
