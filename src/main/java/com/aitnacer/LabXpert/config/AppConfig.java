@@ -16,9 +16,7 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -75,10 +73,27 @@ public class AppConfig {
         return new CorsFilter(source);
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByUserName(username)
-                .orElseThrow(()-> new UsernameNotFoundException("user not found"));
-
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        return username -> userRepository.findByUserName(username)
+//                .orElseThrow(()-> new UsernameNotFoundException("user not found"));
+//
+//    }
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(){
+//        DaoAuthenticationProvider authProvider =new DaoAuthenticationProvider();
+//        authProvider.setUserDetailsService(userDetailsService());
+//        authProvider.setPasswordEncoder(passwordEncoder());
+//        return authProvider;
+//
+//    }
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+//        return config.getAuthenticationManager();
+//
+//    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return  new BCryptPasswordEncoder();
+//    }
 }

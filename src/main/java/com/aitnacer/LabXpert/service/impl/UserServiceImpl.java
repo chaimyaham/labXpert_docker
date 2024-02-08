@@ -8,8 +8,10 @@ import com.aitnacer.LabXpert.service.IUserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,11 @@ public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
+
+
 
 
     public List<UtilisateurDto> getAllUtilisateur(){
@@ -36,6 +43,10 @@ public class UserServiceImpl implements IUserService {
         // TODO verification for administrateur
         Utilisateur utilisateur = modelMapper.map(utilisateurDto, Utilisateur.class);
         System.out.println(utilisateur);
+//        encode the password before saving it to db i encode it using bcrypt
+        String encodedPassword = passwordEncoder.encode(utilisateur.getPassword());
+        utilisateur.setPassword(encodedPassword);
+
         Utilisateur administrateurSaved  = userRepository.save(utilisateur);
         return  modelMapper.map(administrateurSaved, UtilisateurDto.class);
 
@@ -62,4 +73,10 @@ public class UserServiceImpl implements IUserService {
         utilisateur.setDeleted(true);
         userRepository.save(utilisateur);
     }
+
+    @Override
+    public Utilisateur getUserByUserName(String userName) {
+            return userRepository.findByUserNameAndDeletedFalse(userName).orElse(null);
+    }
+
 }
