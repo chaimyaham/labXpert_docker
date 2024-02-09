@@ -30,15 +30,20 @@ public class SecurityConfiguration {
         http.cors().and().csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**")
+                .antMatchers(HttpMethod.GET, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**","/api/v1/result/**")
                 .hasAnyAuthority("RESPONSABLE", "TECHNICIEN")
                 .antMatchers(HttpMethod.POST, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**")
                 .hasAuthority("RESPONSABLE")
-                .antMatchers(HttpMethod.PUT, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**")
+                .antMatchers(HttpMethod.PUT, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**","/api/v1/result/**")
                 .hasAuthority("RESPONSABLE")
-                .antMatchers(HttpMethod.DELETE, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**")
+                .antMatchers(HttpMethod.DELETE, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**","/api/v1/result/**")
                 .hasAuthority("RESPONSABLE")
                 .antMatchers("/api/v1/analyse/**").hasAnyAuthority("RESPONSABLE", "TECHNICIEN")
+                .antMatchers("/api/v1/echantillons/**").hasAnyAuthority("RESPONSABLE", "TECHNICIEN")
+                .antMatchers("/api/v1/patient/**").hasAnyAuthority("RESPONSABLE", "TECHNICIEN")
+                .antMatchers(HttpMethod.POST, "/api/v1/result/**")
+                .hasAnyAuthority("RESPONSABLE","TECHNICIEN")
+                .antMatchers("/refresh-token").permitAll()
                 .anyRequest().authenticated();
         http.addFilter(new JWTAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),jwtHelper));
         http.addFilterBefore(new JWTAuthorizationFilter(jwtHelper), UsernamePasswordAuthenticationFilter.class);
