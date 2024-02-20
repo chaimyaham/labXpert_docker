@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,9 +26,12 @@ public class SecurityConfiguration {
     @Autowired
     private JWTHelper jwtHelper;
 
+    @Autowired
+    private CorsFilter corsFilter;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.cors().and().csrf().disable();
+        http.addFilterBefore(corsFilter, CorsFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/api/v1/user/**", "/api/v1/fournisseur/**", "/api/v1/reactif/**","/api/v1/result/**")
@@ -44,7 +48,9 @@ public class SecurityConfiguration {
                 .antMatchers(HttpMethod.POST, "/api/v1/result/**")
                 .hasAnyAuthority("RESPONSABLE","TECHNICIEN")
                 .antMatchers("/refresh-token").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/login").permitAll()
                 .anyRequest().authenticated();
+
         http.addFilter(new JWTAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),jwtHelper));
         http.addFilterBefore(new JWTAuthorizationFilter(jwtHelper), UsernamePasswordAuthenticationFilter.class);
         return http.build();
